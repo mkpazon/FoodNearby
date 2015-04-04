@@ -1,22 +1,37 @@
 package com.mkpazon.foodnearby;
 
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLocationChangeListener, View.OnClickListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private Button btnFindNearby;
+
+    private Location currentLocation;
+    private static final int DEFAULT_RADIUS = 500;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        initializeViews();
+    }
+
+    private void initializeViews() {
         setUpMapIfNeeded();
+        btnFindNearby = (Button) findViewById(R.id.button_findNearby);
+        btnFindNearby.setOnClickListener(this);
+
     }
 
     @Override
@@ -61,5 +76,23 @@ public class MapsActivity extends FragmentActivity {
      */
     private void setUpMap() {
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationChangeListener(this);
+    }
+
+    @Override
+    public void onMyLocationChange(Location location) {
+        this.currentLocation = location;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == btnFindNearby) {
+            if (currentLocation != null) {
+                PlacesUtility.findPlacesWithinRadius("food", currentLocation, DEFAULT_RADIUS);
+            } else {
+                //TODO show info dialog error
+            }
+        }
     }
 }
