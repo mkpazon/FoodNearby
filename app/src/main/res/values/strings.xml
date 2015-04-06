@@ -2,4 +2,6 @@
     <string name="app_name">FoodNearby</string>
     <string name="title_activity_maps">Food Nearby</string>
     <string name="nearby_food_n_bevarages"><![CDATA[Nearby Food & Beverages]]></string>
+    <string name="details">Details</string>
+    <string name="map">Map</string>
 </resources>

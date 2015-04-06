@@ -1,8 +1,10 @@
 package com.mkpazon.foodnearby;
 
+import android.content.Intent;
 import android.location.Location;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -12,15 +14,18 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
 import com.mkpazon.foodnearby.net.PlacesSearchListener;
 import com.mkpazon.foodnearby.net.PlacesUtility;
 import com.mkpazon.foodnearby.net.Result;
 import com.mkpazon.foodnearby.net.SearchResponse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLocationChangeListener, View.OnClickListener {
+public class MapsActivity extends ActionBarActivity implements GoogleMap.OnMyLocationChangeListener, View.OnClickListener, GoogleMap.OnInfoWindowClickListener {
 
     private static final String TAG = "MapsActivity";
 
@@ -29,13 +34,14 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
     private Location currentLocation;
     private static final int DEFAULT_RADIUS = 500;
-    private List<Marker> markers = new ArrayList<>();
+    private Map<Marker, Result> places = new HashMap<>();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        setTitle(getString(R.string.map));
         initializeViews();
     }
 
@@ -88,20 +94,27 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     private void setUpMap() {
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationChangeListener(this);
+        mMap.setOnInfoWindowClickListener(this);
     }
 
-    private void addMarker(double latitude, double longitude, String title, String description) {
+    private void addMarker(Result place) {
+        com.mkpazon.foodnearby.net.Location location = place.getGeometry().getLocation();
+        double latitude = location.getLat();
+        double longitude = location.getLng();
         Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
-                .title(title)
-                .snippet(description));
-        markers.add(marker);
+                .title(place.getName())
+                .snippet(place.getVicinity()));
+        places.put(marker, place);
+
     }
 
     private void clearMarkers() {
-        for (Marker marker : markers) {
+        for (Marker marker : places.keySet()) {
+            //Remove marker from map
             marker.remove();
         }
+        places.clear();
     }
 
     @Override
@@ -113,7 +126,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     public void onClick(View v) {
         if (v == btnFindNearby) {
             if (currentLocation != null) {
-                PlacesUtility.findPlacesWithinRadius("food", currentLocation, DEFAULT_RADIUS, new PlacesSearchListener() {
+                List<String> types = new ArrayList<>();
+                types.add("food");
+                types.add("cafe");
+                types.add("restaurant");
+                PlacesUtility.findPlacesWithinRadius(types, currentLocation, DEFAULT_RADIUS, new PlacesSearchListener() {
                     @Override
                     public void onResult(SearchResponse response) {
                         Log.d(TAG, "Clearing all markers");
@@ -123,7 +140,10 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                         List<Result> results = response.getResults();
                         for (Result result : results) {
                             com.mkpazon.foodnearby.net.Location location = result.getGeometry().getLocation();
-                            addMarker(location.getLat(), location.getLng(), result.getName(), result.getVicinity());
+                            double latitude = location.getLat();
+                            double longitude = location.getLng();
+                            Log.d(TAG, "> " + result.getName() + " " + latitude + "," + longitude);
+                            addMarker(result);
                         }
                     }
                 });
@@ -132,5 +152,18 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                 //TODO show info dialog error
             }
         }
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Log.d(TAG, "Info window of marker \"" + marker.getTitle() + "\" has been clicked.");
+        Result place = places.get(marker);
+
+        Gson gson = new Gson();
+        String placeJson = gson.toJson(place);
+
+        Intent intent = new Intent(this, PlaceDetailsActivity.class);
+        intent.putExtra(PlaceDetailsActivity.EXTRA_PLACE_JSON, placeJson);
+        startActivity(intent);
     }
 }

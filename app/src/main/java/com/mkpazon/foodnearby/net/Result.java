@@ -8,9 +8,9 @@ public class Result {
     //TODO cleanup!
 
     //    private String icon;
-//    private String id;
-//    private String placeId;
-//    private List<String> photos;
+    //    private String id;
+    //    private String placeId;
+    //    private List<String> photos;
 
     private Geometry geometry;
     private String name;
