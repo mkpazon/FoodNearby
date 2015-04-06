@@ -3,21 +3,32 @@ package com.mkpazon.foodnearby;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mkpazon.foodnearby.net.PlacesSearchListener;
+import com.mkpazon.foodnearby.net.PlacesUtility;
+import com.mkpazon.foodnearby.net.Result;
+import com.mkpazon.foodnearby.net.SearchResponse;
+
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLocationChangeListener, View.OnClickListener {
+
+    private static final String TAG = "MapsActivity";
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private Button btnFindNearby;
 
     private Location currentLocation;
     private static final int DEFAULT_RADIUS = 500;
+    private List<Marker> markers;
 
 
     @Override
@@ -31,7 +42,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         setUpMapIfNeeded();
         btnFindNearby = (Button) findViewById(R.id.button_findNearby);
         btnFindNearby.setOnClickListener(this);
-
     }
 
     @Override
@@ -75,9 +85,22 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationChangeListener(this);
+    }
+
+    private void addMarker(double latitude, double longitude, String title, String description) {
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(latitude, longitude))
+                .title(title)
+                .snippet(description));
+        markers.add(marker);
+    }
+
+    private void clearMarkers() {
+        for (Marker marker : markers) {
+            marker.remove();
+        }
     }
 
     @Override
@@ -89,8 +112,22 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     public void onClick(View v) {
         if (v == btnFindNearby) {
             if (currentLocation != null) {
-                PlacesUtility.findPlacesWithinRadius("food", currentLocation, DEFAULT_RADIUS);
+                PlacesUtility.findPlacesWithinRadius("food", currentLocation, DEFAULT_RADIUS, new PlacesSearchListener() {
+                    @Override
+                    public void onResult(SearchResponse response) {
+                        Log.d(TAG, "Clearing all markers");
+                        clearMarkers();
+
+                        Log.d(TAG, "Adding result markers");
+                        List<Result> results = response.getResults();
+                        for (Result result : results) {
+                            com.mkpazon.foodnearby.net.Location location = result.getGeometry().getLocation();
+                            addMarker(location.getLat(), location.getLng(), result.getName(), result.getVicinity());
+                        }
+                    }
+                });
             } else {
+                Log.d(TAG, "Current location not available");
                 //TODO show info dialog error
             }
         }
