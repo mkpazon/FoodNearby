@@ -17,6 +17,7 @@ import com.mkpazon.foodnearby.net.PlacesUtility;
 import com.mkpazon.foodnearby.net.Result;
 import com.mkpazon.foodnearby.net.SearchResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLocationChangeListener, View.OnClickListener {
@@ -28,7 +29,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
     private Location currentLocation;
     private static final int DEFAULT_RADIUS = 500;
-    private List<Marker> markers;
+    private List<Marker> markers = new ArrayList<>();
 
 
     @Override
