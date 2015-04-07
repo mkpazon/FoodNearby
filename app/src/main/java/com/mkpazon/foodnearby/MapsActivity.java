@@ -1,9 +1,9 @@
 package com.mkpazon.foodnearby;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
@@ -149,7 +149,9 @@ public class MapsActivity extends ActionBarActivity implements GoogleMap.OnMyLoc
                 });
             } else {
                 Log.d(TAG, "Current location not available");
-                //TODO show info dialog error
+                final Dialog dialog = InfoDialog.newInstance(this, getString(R.string.error),
+                        getString(R.string.current_location_not_available), null);
+                dialog.show();
             }
         }
     }

@@ -4,4 +4,7 @@
     <string name="nearby_food_n_bevarages"><![CDATA[Nearby Food & Beverages]]></string>
     <string name="details">Details</string>
     <string name="map">Map</string>
+    <string name="ok">Ok</string>
+    <string name="error">Error</string>
+    <string name="current_location_not_available">Current location not yet available</string>
 </resources>

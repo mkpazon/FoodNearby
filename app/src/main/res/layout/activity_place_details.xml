@@ -15,8 +15,8 @@
             android:id="@+id/textView_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/place_detail_title"
-            android:text="Sample" />
+            android:text="Sample"
+            android:textSize="@dimen/place_detail_title" />
 
         <TextView
             android:id="@+id/textView_vicinity"
@@ -24,14 +24,8 @@
             android:layout_height="wrap_content"
             android:text="sample" />
 
-        <TextView
-            android:id="@+id/textView_opening_hours"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="sample" />
 
-        <android.support.v4.view.ViewPager
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/viewPager_photos"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

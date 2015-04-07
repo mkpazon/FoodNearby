@@ -1,5 +1,6 @@
 package com.mkpazon.foodnearby;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,12 +28,8 @@ public class PlaceDetailsActivity extends ActionBarActivity {
 
     private TextView tvName;
     private TextView tvVicinity;
-    private TextView tvOpeningHours;
     private Result place;
     private ViewPager vpPhotos;
-    private FragmentStatePagerAdapter adapter;
-
-    //TODO add photos?
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,19 +45,24 @@ public class PlaceDetailsActivity extends ActionBarActivity {
             place = gson.fromJson(placeJson, Result.class);
             initializeViews();
         } else {
-            //TODO show error info dialog and exit
             Log.e(TAG, "Place JSON missing");
+            final Dialog dialog = InfoDialog.newInstance(this, getString(R.string.error),
+                    getString(R.string.current_location_not_available), new InfoDialog.InfoDialogOnClickListener() {
+                        @Override
+                        public void onClick() {
+                            finish();
+                        }
+                    });
+            dialog.setCancelable(false);
+            dialog.show();
         }
     }
 
     private void initializeViews() {
         tvName = (TextView) findViewById(R.id.textView_name);
         tvVicinity = (TextView) findViewById(R.id.textView_vicinity);
-        tvOpeningHours = (TextView) findViewById(R.id.textView_opening_hours);
-
         tvName.setText(place.getName());
         tvVicinity.setText(place.getVicinity());
-        tvOpeningHours.setText("???");
 
         vpPhotos = (ViewPager)findViewById(R.id.viewPager_photos);
         FragmentStatePagerAdapter adapter = new PhotoPagerAdapter(getSupportFragmentManager());

@@ -7,13 +7,8 @@ import java.util.List;
  * -=Bitbitbitbit=-
  */
 public class Result {
-    //TODO cleanup!
 
-    //    private String icon;
-    //    private String id;
-    //    private String placeId;
     private List<Photo> photos;
-
     private Geometry geometry;
     private String name;
     private String vicinity;

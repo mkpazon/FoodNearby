@@ -15,10 +15,6 @@ public class SearchResponse {
         this.results = new ArrayList<>();
     }
 
-    public void addResult(Result result) {
-        results.add(result);
-    }
-
     public List<Result> getResults() {
         return results;
     }
