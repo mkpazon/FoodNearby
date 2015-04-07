@@ -1,10 +1,12 @@
 package com.mkpazon.foodnearby.net;
 
+import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.mkpazon.foodnearby.R;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -22,13 +24,12 @@ import java.util.List;
 public class PlacesUtility {
     private static final String TAG = "LocationManager";
     private static final String NEARBY_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?";
-    private static final String GOOGLE_BROWSER_API_KEY = "AIzaSyAWkgzC4t3t0z4I5LCuszCBdfnqnfn32OQ";
 
     private PlacesUtility() {
     }
 
-    public static void findPlacesWithinRadius(List<String> types, Location location, int radius, PlacesSearchListener placesSearchListener) {
-        GetNearbyTask task = new GetNearbyTask(types, location, radius, placesSearchListener);
+    public static void findPlacesWithinRadius(Context context, List<String> types, Location location, int radius, PlacesSearchListener placesSearchListener) {
+        GetNearbyTask task = new GetNearbyTask(context, types, location, radius, placesSearchListener);
         task.execute();
     }
 
@@ -37,12 +38,14 @@ public class PlacesUtility {
         private final Location location;
         private final int radius;
         private PlacesSearchListener placesSearchListener;
+        private final String apiKey;
 
-        public GetNearbyTask(List<String> types, Location location, int radius, PlacesSearchListener placesSearchListener) {
+        public GetNearbyTask(Context context, List<String> types, Location location, int radius, PlacesSearchListener placesSearchListener) {
             this.types = types;
             this.location = location;
             this.radius = radius;
             this.placesSearchListener = placesSearchListener;
+            this.apiKey = context.getResources().getString(R.string.google_browser_key);
         }
 
         @Override
@@ -58,7 +61,7 @@ public class PlacesUtility {
                         "location=" + location.getLatitude() + "," + location.getLongitude() +
                         "&radius=" + radius +
                         "&types=" + typesStrBuilder.toString() +
-                        "&key=" + GOOGLE_BROWSER_API_KEY); //TODO better way of adding this
+                        "&key=" + apiKey);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 InputStream inputStream = null;
                 try {

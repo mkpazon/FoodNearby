@@ -130,7 +130,7 @@ public class MapsActivity extends ActionBarActivity implements GoogleMap.OnMyLoc
                 types.add("food");
                 types.add("cafe");
                 types.add("restaurant");
-                PlacesUtility.findPlacesWithinRadius(types, currentLocation, DEFAULT_RADIUS, new PlacesSearchListener() {
+                PlacesUtility.findPlacesWithinRadius(this, types, currentLocation, DEFAULT_RADIUS, new PlacesSearchListener() {
                     @Override
                     public void onResult(SearchResponse response) {
                         Log.d(TAG, "Clearing all markers");

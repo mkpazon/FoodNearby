@@ -1,5 +1,7 @@
 package com.mkpazon.foodnearby.net;
 
+import java.util.List;
+
 /**
  * Created by mkpazon on 5/4/15.
  * -=Bitbitbitbit=-
@@ -10,7 +12,7 @@ public class Result {
     //    private String icon;
     //    private String id;
     //    private String placeId;
-    //    private List<String> photos;
+    private List<Photo> photos;
 
     private Geometry geometry;
     private String name;
@@ -26,5 +28,9 @@ public class Result {
 
     public String getVicinity() {
         return vicinity;
+    }
+
+    public List<Photo> getPhotos() {
+        return photos;
     }
 }

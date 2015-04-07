@@ -2,13 +2,19 @@ package com.mkpazon.foodnearby;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.mkpazon.foodnearby.net.Photo;
 import com.mkpazon.foodnearby.net.Result;
+
+import java.util.List;
 
 /**
  * Created by mkpazon on 6/4/15.
@@ -23,6 +29,8 @@ public class PlaceDetailsActivity extends ActionBarActivity {
     private TextView tvVicinity;
     private TextView tvOpeningHours;
     private Result place;
+    private ViewPager vpPhotos;
+    private FragmentStatePagerAdapter adapter;
 
     //TODO add photos?
 
@@ -54,5 +62,36 @@ public class PlaceDetailsActivity extends ActionBarActivity {
         tvVicinity.setText(place.getVicinity());
         tvOpeningHours.setText("???");
 
+        vpPhotos = (ViewPager)findViewById(R.id.viewPager_photos);
+        FragmentStatePagerAdapter adapter = new PhotoPagerAdapter(getSupportFragmentManager());
+        vpPhotos.setAdapter(adapter);
+    }
+
+
+    private class PhotoPagerAdapter extends FragmentStatePagerAdapter {
+
+        public PhotoPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            List<Photo> photos = place.getPhotos();
+            String photoReference = photos.get(position).getPhotoReference();
+            Fragment fragment = new PhotoFragment();
+            Bundle data = new Bundle();
+            data.putString(PhotoFragment.EXTRA_PHOTO_REFERENCE, photoReference);
+            fragment.setArguments(data);
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            if(place.getPhotos()!=null) {
+                return place.getPhotos().size();
+            } else {
+                return 0;
+            }
+        }
     }
 }
